@@ -90,6 +90,7 @@ class Example(QtGui.QMainWindow):
         QtCore.QObject.connect(self.spinBox_2, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.onspinBox_2Changed)
         QtCore.QObject.connect(self.spinBox_3, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.onspinBox_3Changed)
         QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.onpushButton_2Clicked)
+        QtCore.QObject.connect(self.pushButton_3, QtCore.SIGNAL(_fromUtf8("clicked()")), self.onpushButton_3Clicked)
         QtCore.QObject.connect(self.pushButton_4, QtCore.SIGNAL(_fromUtf8("clicked()")), self.onpushButton_4Clicked)
 #        QtCore.QObject.connect(self.comboBox_2, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), self.oncomboBox_2currentIndexChanged)
         QtCore.QObject.connect(self.comboBox_2, QtCore.SIGNAL(_fromUtf8("activated(QString)")), self.oncomboBox_2currentIndexChanged)
@@ -281,6 +282,13 @@ class Example(QtGui.QMainWindow):
             item.setText(_translate("Dialog", "Button%s"%(i), None))
         for Obj in Win_list[Win_id[0]]:
             Obj.setVisible(1)
+    def onpushButton_3Clicked(self):
+        if self.comboBox.currentIndex()==0:
+            Win_list[Win_id[0]][Obj_id[0]].pop()
+        elif self.comboBox.currentIndex()==1:
+            Win_list[Win_id[0]].pop()
+            
+            
     def onpushButton_2Clicked(self):
         if self.comboBox.currentIndex()==0:
             for j in range(len(Win_list[Win_id[0]])):
