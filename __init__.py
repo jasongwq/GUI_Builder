@@ -5,7 +5,6 @@ import sys
 import pprint, pickle
 from PyQt4 import QtCore,QtGui
 
-
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -33,35 +32,24 @@ class Example(QtGui.QMainWindow):
         
     def initUI(self):
         widget =QtGui.QWidget();
-        
         self.setCentralWidget(widget);
-        self.pushButton = QtGui.QPushButton(_fromUtf8("颜色"), self)
-        self.pushButton.clicked.connect(self.showDialog)
-        self.frame = QtGui.QFrame(self)
-#        kk=QtGui.QFileDialog.getOpenFileName(self)
-#        pprint.pprint(kk)
-        
-        Win_list[0].append(self.frame);
-        self.frame.setStyleSheet("QWidget { background-color: %s }" 
+        Win_list[0].append(QtGui.QPushButton(self));
+        Win_list[0][0].setStyleSheet("QWidget { background-color: %s }" 
             % col.name())
         self.gridLayout = QtGui.QGridLayout()
         self.gridLayout.setSpacing(10)        
-       
+#        pprint.pprint(Win_list)
         self.label_0 = QtGui.QLabel(self)
         self.label_1 = QtGui.QLabel(self)
         self.label_2 = QtGui.QLabel(self)
         self.label_3 = QtGui.QLabel(self)
-        
         self.spinBox_0 = QtGui.QSpinBox(self)
         self.spinBox_1 = QtGui.QSpinBox(self)
         self.spinBox_2 = QtGui.QSpinBox(self)
-        self.spinBox_3 = QtGui.QSpinBox(self)
-        
+        self.spinBox_3 = QtGui.QSpinBox(self)        
         self.lineEdit = QtGui.QLineEdit(self)
+        self.lineEdit_2 = QtGui.QLineEdit(self)
         self.lineEdit.setMaximumSize(QtCore.QSize(100, 16777215))
-#        self.validator = QtGui.QIntValidator( 0,0xffffff,self);
-        #// 只允许 edit 输入整数 100 到 999
-        #self.lineEdit.setValidator(self.validator);
         self.pushButton_2 = QtGui.QPushButton(self)
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
         self.gridLayout.addWidget(self.pushButton_2, 7, 1, 1, 1)
@@ -71,7 +59,8 @@ class Example(QtGui.QMainWindow):
         self.pushButton_4 = QtGui.QPushButton(self)
         self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
         self.gridLayout.addWidget(self.pushButton_4, 7, 2, 1, 1)
-        
+        self.pushButton = QtGui.QPushButton(_fromUtf8("颜色"), self)
+        self.pushButton.clicked.connect(self.showDialog)
         self.comboBox = QtGui.QComboBox(self)
         self.comboBox.setObjectName(_fromUtf8("comboBox"))
         self.comboBox.addItem(_fromUtf8(""))
@@ -83,8 +72,37 @@ class Example(QtGui.QMainWindow):
         self.listWidget = QtGui.QListWidget(self)
         self.listWidget.setMaximumSize(QtCore.QSize(75, 16777215))
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
-        self.gridLayout.addWidget(self.listWidget, 5, 2, 1, 1)
+        self.gridLayout.addWidget(self.listWidget, 4, 2, 1, 1)
+        self.tableWidget = QtGui.QTableWidget(self)
+        self.tableWidget.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.tableWidget.setEditTriggers(QtGui.QAbstractItemView.AnyKeyPressed|QtGui.QAbstractItemView.CurrentChanged|QtGui.QAbstractItemView.EditKeyPressed)
+        self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
+        self.tableWidget.setColumnCount(1)
+        self.tableWidget.setRowCount(5)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(0, item)
+        self.gridLayout.addWidget(self.tableWidget, 5, 1, 1, 2)
+        self.tableWidget.setCellWidget(0,0,self.spinBox_0);
+        self.tableWidget.setCellWidget(1,0,self.spinBox_1);
+        self.tableWidget.setCellWidget(2,0,self.spinBox_2);
+        self.tableWidget.setCellWidget(3,0,self.spinBox_3);
+        self.tableWidget.setCellWidget(4,0,self.lineEdit_2);
+        
+        
+        
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL(_fromUtf8("editingFinished()")), self.onlineEditChanged)
+        QtCore.QObject.connect(self.lineEdit_2, QtCore.SIGNAL(_fromUtf8("editingFinished()")), self.onlineEdit_2Changed)
+        
         QtCore.QObject.connect(self.spinBox_0, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.onspinBox_0Changed)
         QtCore.QObject.connect(self.spinBox_1, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.onspinBox_1Changed)
         QtCore.QObject.connect(self.spinBox_2, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.onspinBox_2Changed)
@@ -95,7 +113,21 @@ class Example(QtGui.QMainWindow):
 #        QtCore.QObject.connect(self.comboBox_2, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(int)")), self.oncomboBox_2currentIndexChanged)
         QtCore.QObject.connect(self.comboBox_2, QtCore.SIGNAL(_fromUtf8("activated(QString)")), self.oncomboBox_2currentIndexChanged)
         QtCore.QObject.connect(self.listWidget, QtCore.SIGNAL(_fromUtf8("itemClicked(QListWidgetItem*)")), self.onlistWidgetitemClicked)
-        
+#        QtCore.QObject.connect(self.tableWidget, QtCore.SIGNAL(_fromUtf8("cellChanged(int,int)")), self.ontableWidget_0Changed)
+
+        item = self.tableWidget.verticalHeaderItem(0)
+        item.setText(_translate("Dialog", "x", None))
+        item = self.tableWidget.verticalHeaderItem(1)
+        item.setText(_translate("Dialog", "y", None))
+        item = self.tableWidget.verticalHeaderItem(2)
+        item.setText(_translate("Dialog", "w", None))
+        item = self.tableWidget.verticalHeaderItem(3)
+        item.setText(_translate("Dialog", "h", None))
+        item = self.tableWidget.verticalHeaderItem(4)
+        item.setText(_translate("Dialog", "text", None))
+        item = self.tableWidget.horizontalHeaderItem(0)
+        item.setText(_translate("Dialog", "值", None))
+
         self.label_0.setText(_translate("Dialog", "X", None))
         self.label_1.setText(_translate("Dialog", "Y", None))
         self.label_2.setText(_translate("Dialog", "W", None))
@@ -112,24 +144,17 @@ class Example(QtGui.QMainWindow):
         self.comboBox.setItemText(1, _translate("Dialog", "WINDOW", None))
         self.lineEdit.setText(_translate("Dialog", "000000", None))
         
-        self.frame.setGeometry(10, 100, 100, 100)
+        Win_list[0][0].setGeometry(10, 100, 100, 100)
         self.gridLayout.addWidget(self.pushButton, 0, 1, 1, 1)
-        self.gridLayout.addWidget(self.label_0, 1, 1, 1, 1)
-        self.gridLayout.addWidget(self.label_1, 2, 1, 1, 1)
-        self.gridLayout.addWidget(self.label_2, 3, 1, 1, 1)
-        self.gridLayout.addWidget(self.label_3, 4, 1, 1, 1)
         self.gridLayout.addWidget(self.lineEdit, 0, 2, 1, 1)
-        self.gridLayout.addWidget(self.spinBox_0, 1, 2, 1, 1)
         self.spinBox_0.setMaximum(999)
-        self.gridLayout.addWidget(self.spinBox_1, 2, 2, 1, 1)
         self.spinBox_1.setMaximum(999)
-        self.gridLayout.addWidget(self.spinBox_2, 3, 2, 1, 1)
         self.spinBox_2.setMaximum(999)
-        self.gridLayout.addWidget(self.spinBox_3, 4, 2, 1, 1)
         self.spinBox_3.setMaximum(999)
         self.gridLayout.addWidget(self.pushButton_2, 7, 1, 1, 1)
         self.gridLayout.addWidget(self.pushButton_3, 7, 2, 1, 1)
         self.gridLayout.addWidget(self.pushButton_4, 8, 2, 1, 1)
+        
         
         self.spinBox_0.setValue(0)
         self.spinBox_1.setValue(0)
@@ -210,20 +235,19 @@ class Example(QtGui.QMainWindow):
             for j in range(len(Win_list[Win_id[0]])):
                 self.listWidget.takeItem(0)
             for win in range(len(Win_list)-1, -1, -1):
-#                for obj in range(len(Win_list[win])-1, -1, -1):
-#                    Win_list[win].pop()
                 Win_list.pop()
             pprint.pprint(Win_list)
             for win in range(len(Win_config1)):
                 Win_list.append([])
                 for obj in range(len(Win_config1[win])):
-                    Win_list[win].append(QtGui.QFrame(self))
+                    Win_list[win].append(QtGui.QPushButton(self))
                     Win_list[win][obj].setGeometry(
                     Win_config1[win][obj][0],
                     Win_config1[win][obj][1], 
                     Win_config1[win][obj][2], 
                     Win_config1[win][obj][3])
                     Win_list[win][obj].setStyleSheet("QWidget { background-color: %s }"% Win_config1[win][obj][4])    
+                    Win_list[win][obj].setText(_translate("Dialog","%s"%Win_config1[win][obj][5], None))
             for i in range(len(Win_list[Win_id[0]])-1):
                     item = QtGui.QListWidgetItem()
                     self.listWidget.addItem(item)
@@ -233,7 +257,6 @@ class Example(QtGui.QMainWindow):
                 text="%s"%i
                 self.comboBox_2.addItem(_fromUtf8(""))
                 self.comboBox_2.setItemText(i, _translate("Dialog", text, None))
-#            pprint.pprint(Win_list)
     def saveAction(self):
         pkl_filename=QtGui.QFileDialog.getSaveFileName(self)
         if pkl_filename != '':
@@ -250,6 +273,7 @@ class Example(QtGui.QMainWindow):
                         Win_config[win][obj].append(Win_list[win][obj].width())
                         Win_config[win][obj].append(Win_list[win][obj].height())
                         Win_config[win][obj].append("%s"%Win_list[win][obj].palette().color(QtGui.QPalette.Background).name())
+                        Win_config[win][obj].append("%s"%Win_list[win][obj].text())
             output = open(pkl_filename, 'wb')
             pickle.dump(Win_config, output)
             output.close()
@@ -293,7 +317,7 @@ class Example(QtGui.QMainWindow):
         if self.comboBox.currentIndex()==0:
             for j in range(len(Win_list[Win_id[0]])):
                 self.listWidget.takeItem(0)
-            Win_list[Win_id[0]].append(QtGui.QFrame(self))
+            Win_list[Win_id[0]].append(QtGui.QPushButton(self))
             Obj_id[0]=(len(Win_list[Win_id[0]])-1)
             Win_list[Win_id[0]][Obj_id[0]].setStyleSheet("QWidget { background-color: %s }"% col.name())
             if Obj_id[0]>1:
@@ -323,7 +347,7 @@ class Example(QtGui.QMainWindow):
                 Obj.setVisible(0)
             Win_id[0]=(len(Win_list)-1)
             Obj_id[0]=0
-            Win_list[Win_id[0]].append(QtGui.QFrame(self))
+            Win_list[Win_id[0]].append(QtGui.QPushButton(self))
             Win_list[Win_id[0]][Obj_id[0]].setStyleSheet("QWidget { background-color: %s }"% col.name())
             Win_list[Win_id[0]][Obj_id[0]].setGeometry(10, 100, 240, 320)
             self.spinBox_0.setValue(Win_list[Win_id[0]][Obj_id[0]].x()-10)
@@ -339,7 +363,9 @@ class Example(QtGui.QMainWindow):
                 self.listWidget.addItem(item)
                 item = self.listWidget.item(i)
                 item.setText(_translate("Dialog", "Button%s"%(i), None))
-    def onspinBox_0Changed(self, int):
+    def onlineEdit_2Changed(self):
+        Win_list[Win_id[0]][Obj_id[0]].setText(_translate("Dialog","%s"% (unicode(self.lineEdit_2.text())), None))
+    def onspinBox_0Changed(self,int):    
         Win_list[Win_id[0]][Obj_id[0]].move(int+10, Win_list[Win_id[0]][Obj_id[0]].y())
     def onspinBox_1Changed(self, int):
         Win_list[Win_id[0]][Obj_id[0]].move(Win_list[Win_id[0]][Obj_id[0]].x(),int+100)
@@ -348,7 +374,7 @@ class Example(QtGui.QMainWindow):
     def onspinBox_3Changed(self, int):
         Win_list[Win_id[0]][Obj_id[0]].resize(Win_list[Win_id[0]][Obj_id[0]].width(), int)
     def onlineEditChanged(self):
-        self.frame.setStyleSheet("QWidget { background-color: #%s }"
+        Win_list[Win_id[0]][Obj_id[0]].setStyleSheet("QWidget { background-color: #%s }"
                 % (unicode(self.lineEdit.text())))
         
     def center(self):
