@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project GUI -->
-<!-- Saved: 2015-01-29, 01:37:06 -->
+<!-- Saved: 2015-01-29, 15:27:54 -->
 <!-- Copyright (C) 2015 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -14,7 +14,6 @@
   <Sources>
     <Source>__init__.py</Source>
     <Source>Ui_main.py</Source>
-    <Source>t001.py</Source>
     <Source>gendotmatrix.py</Source>
   </Sources>
   <Forms>
