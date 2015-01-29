@@ -116,7 +116,6 @@ Obj_id=[0]
 col = QtGui.QColor(0, 0, 0)
 
 class Example(QtGui.QMainWindow):
-    
     def __init__(self):
         super(Example, self).__init__()
         self.initUI()
@@ -379,8 +378,11 @@ class Example(QtGui.QMainWindow):
         self.spinBox_1.setValue(Win_list[Win_id[0]][Obj_id[0]].y()-100)
         self.spinBox_2.setValue(Win_list[Win_id[0]][Obj_id[0]].width())
         self.spinBox_3.setValue(Win_list[Win_id[0]][Obj_id[0]].height())
+        self.lineEdit_2.setText(_translate("Dialog","%s"% (unicode(Win_list[Win_id[0]][Obj_id[0]].text())), None))
+        strcolor="%s"%(Win_list[Win_id[0]][Obj_id[0]].palette().color(QtGui.QPalette.Background).name())
+        self.lineEdit.setText(_translate("Dialog","%s"% (unicode(strcolor[1:])), None))
         Obj_id[0]=self.listWidget.row(QListWidgetItem)+1
-        
+
     def oncomboBox_2currentIndexChanged(self, int):
         for Obj in Win_list[Win_id[0]]:
             Obj.setVisible(0)
@@ -392,6 +394,10 @@ class Example(QtGui.QMainWindow):
         self.spinBox_1.setValue(Win_list[Win_id[0]][Obj_id[0]].y()-100)
         self.spinBox_2.setValue(Win_list[Win_id[0]][Obj_id[0]].width())
         self.spinBox_3.setValue(Win_list[Win_id[0]][Obj_id[0]].height())
+        self.lineEdit_2.setText(_translate("Dialog","%s"% (unicode(Win_list[Win_id[0]][Obj_id[0]].text())), None))
+        strcolor="%s"%(Win_list[Win_id[0]][Obj_id[0]].palette().color(QtGui.QPalette.Background).name())
+        self.lineEdit.setText(_translate("Dialog","%s"% (unicode(strcolor[1:])), None))
+        
         for i in range(len(Win_list[Win_id[0]])-1):
             item = QtGui.QListWidgetItem()
             self.listWidget.addItem(item)
@@ -484,6 +490,7 @@ class Example(QtGui.QMainWindow):
             self.lineEdit.setText("%s"%text[1:])
     def onpushButton_4Clicked(self):
         pkl_filename=QtGui.QFileDialog.getSaveFileName(self)
+        print pkl_filename
         k="%s"%pkl_filename
 #        k=k[-4:]
         k=k[-11:]
