@@ -5,6 +5,96 @@ import sys
 import pprint, pickle
 from PyQt4 import QtCore,QtGui
 
+from PIL import Image, ImageDraw, ImageFont
+import bitarray
+from bitarray import bitarray
+import getopt
+import sys
+import re
+
+def get_pix(image):
+    pixel = image.load()
+    width, height = image.size
+    bitmap = bitarray()
+    for h in range(height):
+        for w in range(width):
+            # if int(sum(pixel[w, h])) > (255 * 3 / 2):
+            if pixel[w, h] > 0:
+                bitmap.append(False)
+            else:
+                bitmap.append(True)
+    return bitmap
+
+
+def get_gb2312_pix(gb2312_code, w, h, usr_font):
+    # image = Image.new("RGB", (w, h), (255, 255, 255))
+    image = Image.new("1", (w, h), (1))
+    d_usr = ImageDraw.Draw(image)
+    try:
+        unicode_code = gb2312_code.decode('gb2312')
+        # d_usr.text((0, 0), unicode_code, (0,0,0), font=usr_font)
+        d_usr.text((0, 0), unicode_code, (0), font=usr_font)
+    except:
+        # d_usr.text((0, 0), u" ", (0,0,0), font=usr_font)
+        d_usr.text((0, 0), u" ", (0), font=usr_font)
+    return get_pix(image)
+def dot_matrix(hz_in):
+    truetypefile = 'simsun.ttc'
+    font_width = 16
+    font_height = 16
+    outfilename = 'dot_matrix.font'
+    usr_font = ImageFont.truetype(truetypefile, font_height)
+    with open(outfilename, 'wb') as outfile:
+#        hz_in=u'美的吃喝拉撒美的吃喝拉撒'
+        hz_in=list(hz_in)
+        hz_in=list(set(hz_in))
+        
+#        hz_list.sort()
+        str=[]
+        str.append([])
+        str.append([])
+        str.append([])
+        str[1].append("void *p%s_%sx%s[]={"%(truetypefile[:-4],font_width, font_height))
+        str[2].append("u16 GBK_code_%s_%sx%s[]={"%(truetypefile[:-4],font_width, font_height))
+        hz_list=[]
+        for a in range(len(hz_in)):
+            hz_list.append(unicode(hz_in[a]).encode('gbk'))
+        hz_list.sort();
+        for a in hz_list:
+            if len(a)>1:
+                data = get_gb2312_pix(chr(ord(a[0])) + chr(ord(a[1])), font_width, font_height, usr_font)
+                str[0].append("//%s\n"%a)
+                str[0].append("char ot_%s[]={"%(hex(ord(a[0])*256+(ord(a[1])))))
+                for x in range(0, len(data), 8):
+                    if x>0:
+                        str[0].append(",")
+                    str[0].append("%s"%(hex(int(data.to01()[x:x+8], 2))))
+                str[0].append("};\n")
+                if len(str[1])==1:
+                    str[1].append("\n(void *)ot_%s"%(hex(ord(a[0])*256+(ord(a[1])))))
+                else:
+                    str[1].append(",\n(void *)ot_%s"%(hex(ord(a[0])*256+(ord(a[1])))))
+                if len(str[2])==1:
+                    str[2].append("%s"%(hex(ord(a[0])*256+(ord(a[1])))))
+                else:
+                    str[2].append(",%s"%(hex(ord(a[0])*256+(ord(a[1])))))
+        str[1].append("};\n")
+        str[2].append("};\n")
+        
+        str[2].append("Font User_Font_%s_%sx%s={\n"%(truetypefile[:-4],font_width, font_height))
+        str[2].append("    GBK_code_%s_%sx%s,\n"%(truetypefile[:-4],font_width, font_height))
+        str[2].append("    p%s_%sx%s,\n"%(truetypefile[:-4],font_width, font_height))
+        str[2].append("    %s,\n"%font_width)
+        str[2].append("    sizeof(GBK_code_%s_%sx%s)\n"%(truetypefile[:-4],font_width, font_height))
+        str[2].append("};")
+        
+        pkl_filename='font_Mat.h'
+        file_object = open(pkl_filename, 'w')
+        file_object.writelines(str[0])
+        file_object.writelines(str[1])
+        file_object.writelines(str[2])
+        file_object.close()
+    
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -20,6 +110,7 @@ except AttributeError:
 Win_list =[[]]
 Win_config =[[[]]]
 Str_Code=[[]]
+FontCode=''
 Win_id=[0]
 Obj_id=[0]
 col = QtGui.QColor(0, 0, 0)
@@ -259,7 +350,9 @@ class Example(QtGui.QMainWindow):
                 self.comboBox_2.setItemText(i, _translate("Dialog", text, None))
     def saveAction(self):
         pkl_filename=QtGui.QFileDialog.getSaveFileName(self)
-        if pkl_filename != '':
+        k="%s"%pkl_filename
+        k=k[-4:]
+        if cmp(k, '.pkl') == 0:
             pprint.pprint(Win_config)
             for win in range(len(Win_config)-1, -1, -1):
                 Win_config.pop()
@@ -391,7 +484,15 @@ class Example(QtGui.QMainWindow):
             self.lineEdit.setText("%s"%text[1:])
     def onpushButton_4Clicked(self):
         pkl_filename=QtGui.QFileDialog.getSaveFileName(self)
-        if pkl_filename != '':
+        k="%s"%pkl_filename
+#        k=k[-4:]
+        k=k[-11:]
+        if cmp(k, 'UI_User.cpp') == 0:
+            for i in range(len(Str_Code)):
+                Str_Code.pop()
+            FontCode=''
+            
+            Str_Code.append([])
             Str_Code.append([])
             Str_Code.append([])
             Str_Code[0].append("#include \"UI.h\"\n")
@@ -426,15 +527,24 @@ class Example(QtGui.QMainWindow):
                         Win_list[win][obj].width(),
                         Win_list[win][obj].height()
                         ))
+                    strcolor="%s"%(Win_list[win][obj].palette().color(QtGui.QPalette.Background).name())
+                    numcolor=(int(strcolor[1:3], 16))/8*2048+(int(strcolor[3:5], 16))/4*32+(int(strcolor[5:7], 16))/8
+                    Str_Code[2].append("Button%s_%s.rect.Set_BackColor(%s);\n"%(
+                        win,obj,
+                        hex(numcolor)
+                        ))
                     Str_Code[2].append("Button%s_%s.text.Set_Text((char *)\"%s\");\n"%(
                         win,obj,
-                        "ceshi"
+                        unicode(Win_list[win][obj].text()).encode('gbk')
                         ))
+                    pprint.pprint(unicode(Win_list[win][obj].text()).encode('gbk'))
+                    print(unicode(Win_list[win][obj].text()).encode('utf-8'))
                     Str_Code[2].append("Button%s_%s.Set_Event(&Button%s_%s_Event);\n"%(
                         win,obj,win,obj))
                     Str_Code[0].append("Button Button%s_%s;\n"%(win,obj))
                     Str_Code[1].append("int Button%s_%s_Event(Event event){"%(win,obj))
-                    Str_Code[1].append("if (event == press){window%s.Refresh();}return 0;}\n"%win)
+                    Str_Code[1].append("if (event == release){window%s.Refresh();}return 0;}\n"%(win+1))
+                    FontCode+=(unicode(Win_list[win][obj].text()))
             Str_Code[2].append("window0.Refresh();\n")
             Str_Code[2].append("}\n")
             
@@ -443,6 +553,7 @@ class Example(QtGui.QMainWindow):
             file_object.writelines(Str_Code[1])
             file_object.writelines(Str_Code[2])
             file_object.close()
+            dot_matrix(FontCode)
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
@@ -450,6 +561,7 @@ class Example(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
